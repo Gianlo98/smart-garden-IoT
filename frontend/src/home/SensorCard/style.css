@@ -1,0 +1,7 @@
+.sensor_card {
+    width: 200px;
+    padding: 20px;
+    margin: 20px;
+    border: 1px solid #f2f7ff;
+    border-radius: 21px;
+}
