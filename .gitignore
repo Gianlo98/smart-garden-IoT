@@ -1,0 +1,6 @@
+.pio
+.cache
+.pioenvs
+.piolibdeps
+.vscode
+secrets.h
