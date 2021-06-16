@@ -79,24 +79,3 @@ void SMCore::checkWifiStatus() {
 
     }
 }
-
-
-/*  TODO
-
-+ Master ascolta tutti i topic e salva risposte in struct
-+ Master pubblica topic per action nei moduli
-
-+ Slave si interfaccia con il modulo
-
-Master prende i config dal server MySQL
-
-Master alert su MySQL server
-
-InfluxDB e WebServer devono rifunzionare
-
-variabili da salvare nel db:
-waterTankLev
-Sys status
-
-
-*/

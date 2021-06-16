@@ -1,9 +1,8 @@
 #include "sm_core.h"
 
 SMCore smCore;
+SM_Telegram m_telegram;
 
-
-SM_SoilMoisture m_moisture(A0);
 
 void setup() {
     smCore.coreSetup();
@@ -12,4 +11,3 @@ void setup() {
 void loop() {
     smCore.coreLoop();  
 }
-

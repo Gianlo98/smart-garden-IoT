@@ -21,6 +21,7 @@
     #include "sm_status_btn.h"
     #include "sm_status_led.h"
     #include "sm_waterengine.h"
+    #include "sm_telegram.h"
 
     /*
     * Global variable declaration 
@@ -48,6 +49,10 @@
 
     #ifdef M_LED
         extern SM_StatusLed m_led; 
+    #endif 
+
+    #ifdef M_TELEGRAM
+        extern SM_Telegram m_telegram; 
     #endif 
 
 

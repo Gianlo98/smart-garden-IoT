@@ -59,6 +59,10 @@ void SMNetSlave::publishDiscoverMessage(){
         modules.add("led");
     #endif 
 
+    #ifdef M_TELEGRAM
+        modules.add("telegram");
+    #endif 
+
 
     String json;
     serializeJson(doc, json);
@@ -186,6 +190,19 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
                 }
 
             });
+        #endif 
+
+        #ifdef M_TELEGRAM
+            String telegram_topic = modules["telegram"];
+            addToSensorMap(telegram_topic, [&]() {
+                if (m_telegram.newMessagePresent()) {
+                    String message = m_telegram.getLastMessage();
+                    Serial.println(message);
+
+                    m_telegram.sendMessage("OK");
+                }
+                return "";
+            }, false);
         #endif 
         
         _masterNode.id = masterId;
