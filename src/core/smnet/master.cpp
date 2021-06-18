@@ -44,29 +44,39 @@ void SMNetMaster::handleDiscoverMessage(String &message){
                 } else if (module.equals("moisture")) {
                     _net->addToTopicMap(topic, [&](String &message) {
                         sm_values.moisture = message.toInt();
+                        if (sm_values.moisture <= sm_config.moistureTreshold && sm_values.moisture != 0 ) {
+
+                            Serial.println("[Master] Moisture level under treshold");
+                            /*
+                            if (_mysqlConnection.connect(addr, DB_PORT, user, pass, name)) {
+                                MySQL_Cursor *cur_mem = new MySQL_Cursor(&_mysqlConnection);
+                                char query[150];
+
+                                String moisture = String(sm_values.moisture);
+                                sprintf(
+                                    query, 
+                                    "INSERT INTO sm_alerts (value, module_id) VALUES ('%s', ( SELECT id FROM network_clients_modules WHERE topic = '%s'))", 
+                                    moisture.c_str(),
+                                    topic.c_str()
+                                );
+
+                                cur_mem->execute(query);
+                                delete cur_mem;
+                                _mysqlConnection.close();
+                            } */
+
+
+                            
+                            if (!sm_values.nextDayRain) {
+                                Serial.println("[Master] Watering plants. ");
+                                _mqttClient.publish(_waterTopic, "1");
+                            } else if (sm_values.moisture <= (sm_config.moistureTreshold / 2)) {
+                                Serial.println("[Master] Moisture level critical, watering plants.");
+                            } else {
+                                Serial.println("[Master] Smart raining enabled, unable to water plants.");
+                            }
+                        }
                     });
-
-                    if (sm_values.moisture <= sm_config.moistureTreshold && sm_values.moisture != 0 ) {
-                        if (_mysqlConnection.connect(addr, DB_PORT, user, pass, name)) {
-                            MySQL_Cursor *cur_mem = new MySQL_Cursor(&_mysqlConnection);
-                            char query[150];
-
-                            String tmp = String(sm_values.moisture);
-                            sprintf(
-                                query, 
-                                "INSERT INTO sm_alerts (value, module_id) VALUES ('%s', ( SELECT id FROM network_clients_modules WHERE topic = '%s'))", 
-                                tmp.c_str(),
-                                topic.c_str()
-                            );
-
-                            cur_mem->execute(query);
-                            delete cur_mem;
-                            _mysqlConnection.close();
-                        } 
-
-                        _mqttClient.publish(_waterTopic, "1");
-                    }
-
                 } else if (module.equals("light")) {
                     _net->addToTopicMap(topic, [&](String &message) {
                         sm_values.light = message.toInt();
@@ -113,9 +123,27 @@ void SMNetMaster::handleDiscoverMessage(String &message){
                                 delete cur_mem;
                                 _mysqlConnection.close();
                             } 
+                            
                         }
                         
 
+                    });
+                } else if (module.equals("telegram")) {
+                    _net->addToTopicMap(topic, [&](String &message) {
+                        if (message.equals("ON")) {
+                            _mqttClient.publish(_waterTopic, "1");
+                        } else if (message.equals("OFF")) {
+                            _mqttClient.publish(_waterTopic, "0");
+                        }
+                    });
+                } else if (module.equals("weather")) {
+                    _net->addToTopicMap(topic, [&](String &message) {
+                        if (message.toDouble() > 0.2) {
+                            sm_values.nextDayRain = true;
+                            Serial.println("[Master] Enabling smart rain");
+                        } else {
+                            sm_values.nextDayRain = false;
+                        }                       
                     });
                 }
             }

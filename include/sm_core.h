@@ -22,6 +22,7 @@
     #include "sm_status_led.h"
     #include "sm_waterengine.h"
     #include "sm_telegram.h"
+    #include "sm_weather.h"
 
     /*
     * Global variable declaration 
@@ -55,6 +56,10 @@
         extern SM_Telegram m_telegram; 
     #endif 
 
+    #ifdef M_WEATHER
+        extern SM_Weather m_weather;
+    #endif
+
 
     /*
     * Globally accessible struct
@@ -62,7 +67,8 @@
     struct SmartGardenValues {
         float humidity, temp, light, moisture; 
         uint32_t waterTankValue;
-        bool watering;   
+        bool watering;
+        bool nextDayRain; 
     };
 
     struct SmartGardenConfig {
@@ -209,7 +215,5 @@
     extern SMCore smCore;
     extern SmartGardenValues sm_values;
     extern SmartGardenConfig sm_config; 
+
 #endif
-
-
-

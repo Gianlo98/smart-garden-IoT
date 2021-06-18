@@ -118,6 +118,10 @@ void SMNet::handleIncomingMessage(String &topic, String &payload) {
 
 void SMNet::promoteNodeToMaster() {
 	StaticJsonDocument<PROTOCOL_JSON_MAX_LENGHT> doc;
+    #ifndef MASTER_NODE
+        ESP.reset();
+    #endif
+
 	doc["nodeId"] = getNodeIdentifier();
 	doc["master"] = true;
 	doc["action"] = "PROCLAMING";

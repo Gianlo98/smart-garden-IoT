@@ -63,6 +63,9 @@ void SMNetSlave::publishDiscoverMessage(){
         modules.add("telegram");
     #endif 
 
+    #ifdef M_WEATHER
+       modules.add("weather");
+    #endif 
 
     String json;
     serializeJson(doc, json);
@@ -169,9 +172,9 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
 
             addToSensorMap(water_topic, [&]() -> String { 
             
-            if (m_water.newStateAvailable()) {
-                    return (m_water.readNewState() ? "1" : "0");
-                }
+                if (m_water.newStateAvailable()) {
+                        return (m_water.readNewState() ? "1" : "0");
+                    }
                 return "";
 
             }, false);
@@ -197,13 +200,24 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
             addToSensorMap(telegram_topic, [&]() {
                 if (m_telegram.newMessagePresent()) {
                     String message = m_telegram.getLastMessage();
-                    Serial.println(message);
-
                     m_telegram.sendMessage("OK");
+                    return message;
                 }
                 return "";
-            }, false);
+            });
         #endif 
+
+        #ifdef M_WEATHER
+            String weather_topic = modules["weather"];
+            addToSensorMap(weather_topic, [&]() {
+                String weather = m_weather.getWeatherData();
+                m_weather.goToDeepSleep();
+                return weather;
+            });
+        #endif 
+
+
+
         
         _masterNode.id = masterId;
         isJoined = true;
@@ -250,17 +264,19 @@ void SMNetSlave::publishSensorValues() {
 
         //If exist a values to be updated
         if (!value.equals("")) {
-            Serial.println("[SMNet] publishing on topic " + _inputSensorMap[i].topic + " : " + value);
+            Serial.println("[Slave] publishing on topic " + _inputSensorMap[i].topic + " : " + value);
             _mqttClient.publish(_inputSensorMap[i].topic, value);
         }
     }
 
     if (millis() - _lastSensorUpdate > 5000 && _readOnlyReadingsEnabled) {
+        Serial.println("[Slave] reading from readOnly Sensors");
         _lastSensorUpdate = millis();
 
         for (int i = 0; i < _readOnlySensorMapSize; i++) {
-            Serial.println("[SMNet] publishing on topic " + _readOnlySensorMap[i].topic + " : " + _readOnlySensorMap[i].funct());
-            _mqttClient.publish(_readOnlySensorMap[i].topic, _readOnlySensorMap[i].funct());
+            String value = _readOnlySensorMap[i].funct();
+            Serial.println("[Slave] publishing on topic " + _readOnlySensorMap[i].topic + " : " + value);
+            _mqttClient.publish(_readOnlySensorMap[i].topic, value);
         }
     }
 }

@@ -1,8 +1,8 @@
 #ROADMAP
 
-- [X] Develop telegram integration
-- [X] Develop weather API integration
-- [ ] Implement deep sleep modules
+- [X][X] Develop telegram integration
+- [X][X] Develop weather API integration
+- [X] Implement deep sleep modules
 - [X] Modularize InfluxDB 
 - [ ] Review the GUI
-- [-] Smart watering feature
+- [X] Smart watering feature
