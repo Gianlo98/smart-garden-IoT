@@ -27,6 +27,7 @@ void SM_DHT11::printSensorDetail() {
 }
 
 float SM_DHT11::getTemperature() {
+    checkDeepSleep();
     sensors_event_t event;
     _dht.temperature().getEvent(&event);
     return event.temperature;
@@ -34,6 +35,7 @@ float SM_DHT11::getTemperature() {
 }
 
 float SM_DHT11::getHumidity() {
+    checkDeepSleep();
     sensors_event_t event;
     _dht.humidity().getEvent(&event);
     return event.relative_humidity;

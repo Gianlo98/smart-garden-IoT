@@ -6,7 +6,7 @@ SMCore smCore;
 //SM_Photoresistor m_light(A0);
 //SM_StatusBtn m_btn(D0);
 //SM_StatusLed m_led(D2, D3, D4);
-
+SM_WaterEngine m_water(D7);
 
 void setup() {
     smCore.coreSetup();

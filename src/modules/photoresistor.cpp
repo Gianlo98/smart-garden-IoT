@@ -7,5 +7,6 @@ SM_Photoresistor::SM_Photoresistor(int pin) {
 }
 
 int SM_Photoresistor::readLightValue() {
+    checkDeepSleep();
     return analogRead(_pin);
 }

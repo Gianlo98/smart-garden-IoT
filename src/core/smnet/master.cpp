@@ -72,6 +72,7 @@ void SMNetMaster::handleDiscoverMessage(String &message){
                                 _mqttClient.publish(_waterTopic, "1");
                             } else if (sm_values.moisture <= (sm_config.moistureTreshold / 2)) {
                                 Serial.println("[Master] Moisture level critical, watering plants.");
+                                _mqttClient.publish(_waterTopic, "1");
                             } else {
                                 Serial.println("[Master] Smart raining enabled, unable to water plants.");
                             }

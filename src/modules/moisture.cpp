@@ -9,5 +9,6 @@ SM_SoilMoisture::SM_SoilMoisture(int pin) {
 }
 
 int SM_SoilMoisture::readMoistureValue() {
+    checkDeepSleep();
     return map(analogRead(_pin), AirValue, WaterValue, 0, 100);
 }

@@ -101,6 +101,7 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
 
             String hum_topic = modules["hum"];
             addToSensorMap(hum_topic, [&]() {
+                m_dht.goToDeepSleep();
                 return String(m_dht.getHumidity());
             });
         #endif 
@@ -109,6 +110,7 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
             String moisture_topic = modules["moisture"];
             if (moisture_topic != NULL) {
                 addToSensorMap(moisture_topic, [&]() {
+                    m_moisture.goToDeepSleep();
                     return String(m_moisture.readMoistureValue());
                 });
             }
@@ -117,6 +119,7 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
         #ifdef M_LIGHT
             String light_topic = modules["light"];
             addToSensorMap(light_topic, [&]() {
+                m_light.goToDeepSleep();
                 return String(m_light.readLightValue());
             });
         #endif 
@@ -125,6 +128,7 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
             String btn_topic = modules["btn"];
             addToSensorMap(btn_topic, [&]() {
                 if (m_btn.isButtonPressed()) {
+                    m_btn.goToDeepSleep();
                     return _readOnlyReadingsEnabled ? "0" : "1";
                 }
                 return "";
@@ -203,8 +207,10 @@ void SMNetSlave::handleDiscoverMessage(String &message) {
                     m_telegram.sendMessage("OK");
                     return message;
                 }
-                return "";
-            });
+                String tmp = "";
+                return tmp;  
+            
+            }, false);
         #endif 
 
         #ifdef M_WEATHER
@@ -243,13 +249,18 @@ void SMNetSlave::handleLastWillMessage(String &message) {
 }
 
 bool SMNetSlave::shouldNodeBecomeMaster() {
-    return _masterNode.id.equals("") && millis() > _masterNode.becomeMasterInterval; 
+    #ifndef MASTER_NODE
+        return false
+    #else
+        return _masterNode.id.equals("") && millis() > _masterNode.becomeMasterInterval; 
+    #endif
 }
 
 /**
  *  Slave only function, updates all sensor values to the associated MQTT topic
 */
 void SMNetSlave::addToSensorMap(String &topic, SMNetSensorFunction funct, bool readOnly) {
+    Serial.println("[Slave] Registering sensor topic " + topic +  " ( " + (readOnly ? "readOnly" : "inputTopic") + ")");
     if (readOnly) {
         _readOnlySensorMap[_readOnlySensorMapSize++] = {topic, funct};
     } else {

@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include "sm_sensor.h"
 
 #ifndef SM_DTH11_H    
     #define SM_DTH11_H
@@ -8,7 +9,7 @@
     #define DHTTYPE DHT11
 
 
-    class SM_DHT11 {
+    class SM_DHT11 : public SMSensor{
         public:
             SM_DHT11(int pin);
             void printSensorDetail();
